@@ -12,7 +12,7 @@ run: run-$(ARCH)
 
 .PHONY: run-x86_64
 run-x86_64: ovmf $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 2G -enable-kvm -bios ovmf-x86_64/OVMF.fd -cpu host -cdrom $(IMAGE_NAME).iso -boot d -debugcon stdio -no-shutdown -no-reboot -cpu host -smp $(SMP_CORES)
+	qemu-system-x86_64 -M q35 -m 2G -enable-kvm -bios ovmf-x86_64/OVMF.fd -cpu host -cdrom $(IMAGE_NAME).iso -boot d -serial stdio -no-shutdown -no-reboot -cpu host -smp $(SMP_CORES)
 
 .PHONY: run-aarch64
 run-aarch64: ovmf $(IMAGE_NAME).iso
@@ -42,7 +42,7 @@ ovmf-riscv64:
 	cd ovmf-riscv64 && curl -o OVMF.fd https://retrage.github.io/edk2-nightly/bin/RELEASERISCV64_VIRT.fd && dd if=/dev/zero of=OVMF.fd bs=1 count=0 seek=33554432
 
 limine:
-	git clone https://github.com/limine-bootloader/limine.git --branch=v5.x-branch-binary --depth=1
+	git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary --depth=1
 	$(MAKE) -C limine CC="$(HOST_CC)"
 
 

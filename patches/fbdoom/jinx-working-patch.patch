@@ -1,0 +1,150 @@
+diff --git fbdoom-clean/fbdoom/d_iwad.c fbdoom-workdir/fbdoom/d_iwad.c
+index 6a51ea8..992b563 100644
+--- fbdoom-clean/fbdoom/d_iwad.c
++++ fbdoom-workdir/fbdoom/d_iwad.c
+@@ -32,12 +32,14 @@
+ #include "w_wad.h"
+ #include "z_zone.h"
+ 
++#define ORIGCODE 1
+ static const iwad_t iwads[] =
+ {
+     { "doom2.wad",    doom2,     commercial, "Doom II" },
+     { "plutonia.wad", pack_plut, commercial, "Final Doom: Plutonia Experiment" },
+     { "tnt.wad",      pack_tnt,  commercial, "Final Doom: TNT: Evilution" },
+     { "doom.wad",     doom,      retail,     "Doom" },
++    { "doom1.wad",    doom,      shareware,  "Doom Shareware" },
+     { "DOOM1.WAD",    doom,      shareware,  "Doom Shareware" },
+     { "chex.wad",     pack_chex, shareware,  "Chex Quest" },
+     { "hacx.wad",     pack_hacx, commercial, "Hacx" },
+@@ -409,6 +411,8 @@ static char *CheckDirectoryHasIWAD(char *dir, char *iwadname)
+ {
+     char *filename; 
+ 
++
++    
+     // As a special case, the "directory" may refer directly to an
+     // IWAD file if the path comes from DOOMWADDIR or DOOMWADPATH.
+ 
+@@ -429,6 +433,9 @@ static char *CheckDirectoryHasIWAD(char *dir, char *iwadname)
+         filename = M_StringJoin(dir, DIR_SEPARATOR_S, iwadname, NULL);
+     }
+ 
++
++    printf("Trying IWAD file:%s\n", filename);
++
+     if (M_FileExists(filename))
+     {
+         return filename;
+diff --git fbdoom-clean/fbdoom/i_input_tty.c fbdoom-workdir/fbdoom/i_input_tty.c
+index 95e1b60..4cdb8eb 100644
+--- fbdoom-clean/fbdoom/i_input_tty.c
++++ fbdoom-workdir/fbdoom/i_input_tty.c
+@@ -73,7 +73,7 @@ static const char at_to_doom[] =
+     /* 0x0e */ KEY_BACKSPACE,
+     /* 0x0f */ KEY_TAB,
+     /* 0x10 */ 'q',
+-    /* 0x11 */ 'w',
++    /* 0x11 */ KEY_UPARROW, /* w */
+     /* 0x12 */ 'e',
+     /* 0x13 */ 'r',
+     /* 0x14 */ 't',
+@@ -86,9 +86,9 @@ static const char at_to_doom[] =
+     /* 0x1b */ ']',
+     /* 0x1c */ KEY_ENTER,
+     /* 0x1d */ KEY_FIRE, /* KEY_RCTRL, */
+-    /* 0x1e */ 'a',
+-    /* 0x1f */ 's',
+-    /* 0x20 */ 'd',
++    /* 0x1e */ KEY_LEFTARROW, /* a */
++    /* 0x1f */ KEY_DOWNARROW, /* s */
++    /* 0x20 */ KEY_RIGHTARROW, /* d */
+     /* 0x21 */ 'f',
+     /* 0x22 */ 'g',
+     /* 0x23 */ 'h',
+@@ -128,15 +128,15 @@ static const char at_to_doom[] =
+     /* 0x45 */ KEY_NUMLOCK,
+     /* 0x46 */ 0x0,
+     /* 0x47 */ 0x0, /* 47 (Keypad-7/Home) */
+-    /* 0x48 */ 0x0, /* 48 (Keypad-8/Up) */
++    /* 0x48 */ KEY_UPARROW, /* 48 (Keypad-8/Up) */
+     /* 0x49 */ 0x0, /* 49 (Keypad-9/PgUp) */
+     /* 0x4a */ 0x0, /* 4a (Keypad--) */
+-    /* 0x4b */ 0x0, /* 4b (Keypad-4/Left) */
++    /* 0x4b */ KEY_LEFTARROW, /* 4b (Keypad-4/Left) */
+     /* 0x4c */ 0x0, /* 4c (Keypad-5) */
+-    /* 0x4d */ 0x0, /* 4d (Keypad-6/Right) */
++    /* 0x4d */ KEY_RIGHTARROW, /* 4d (Keypad-6/Right) */
+     /* 0x4e */ 0x0, /* 4e (Keypad-+) */
+     /* 0x4f */ 0x0, /* 4f (Keypad-1/End) */
+-    /* 0x50 */ 0x0, /* 50 (Keypad-2/Down) */
++    /* 0x50 */ KEY_DOWNARROW, /* 50 (Keypad-2/Down) */
+     /* 0x51 */ 0x0, /* 51 (Keypad-3/PgDn) */
+     /* 0x52 */ 0x0, /* 52 (Keypad-0/Ins) */
+     /* 0x53 */ 0x0, /* 53 (Keypad-./Del) */
+diff --git fbdoom-clean/fbdoom/i_system.c fbdoom-workdir/fbdoom/i_system.c
+index 5d00091..e51db01 100644
+--- fbdoom-clean/fbdoom/i_system.c
++++ fbdoom-workdir/fbdoom/i_system.c
+@@ -30,9 +30,6 @@
+ #include <unistd.h>
+ #endif
+ 
+-#ifdef ORIGCODE
+-#include "SDL.h"
+-#endif
+ 
+ #include "config.h"
+ 
+@@ -58,6 +55,7 @@
+ #define DEFAULT_RAM 6 /* MiB */
+ #define MIN_RAM     6  /* MiB */
+ 
++#define ORIGCODE 1
+ 
+ typedef struct atexit_listentry_s atexit_listentry_t;
+ 
+@@ -239,6 +237,8 @@ void I_BindVariables(void)
+ }
+ */
+ 
++void kbd_shutdown(void);
++
+ //
+ // I_Quit
+ //
+@@ -257,11 +257,8 @@ void I_Quit (void)
+         entry = entry->next;
+     }
+ 
+-#if ORIGCODE
+-    SDL_Quit();
+-
++    kbd_shutdown();
+     exit(0);
+-#endif
+ }
+ 
+ #if !defined(_WIN32) && !defined(__MACOSX__)
+@@ -456,8 +453,6 @@ void I_Error (char *error, ...)
+ 
+     // abort();
+ #if ORIGCODE
+-    SDL_Quit();
+-
+     exit(-1);
+ #else
+     while (true)
+diff --git fbdoom-clean/fbdoom/i_timer.c fbdoom-workdir/fbdoom/i_timer.c
+index 081b38e..eaa329d 100644
+--- fbdoom-clean/fbdoom/i_timer.c
++++ fbdoom-workdir/fbdoom/i_timer.c
+@@ -75,7 +75,7 @@ int I_GetTimeMS(void)
+ void I_Sleep(int ms)
+ {
+     //SDL_Delay(ms);
+-    usleep (ms * 1000);    
++    //usleep (ms * 1000);    
+ }
+ 
+ void I_WaitVBL(int count)

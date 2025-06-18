@@ -1,0 +1,17 @@
+name=fbdoom
+tarball_url="https://github.com/maximevince/fbDOOM/archive/912c51c4d0e5aa899bb534e8c77227a556ff2377.tar.gz"
+tarball_blake2b="d8209922a71f8172dd2d8d10d38d87925b7f0cfd905ab13a87148f8af871e3c994d53aeca176a641076fb1f7bf6b8a807d19fa7020690c13946c7a896c7b0b16"
+version=0.0
+revision=1
+hostdeps="gcc binutils"
+deps="core-libs"
+
+build() {
+    cp -r "${source_dir}"/fbdoom/* .
+    CROSS_COMPILE=${OS_TRIPLET}- NOSDL=1 make -j${parallelism}
+}
+
+package() {
+    mkdir -p ${dest_dir}/usr/bin
+    cp -f fbdoom ${dest_dir}/usr/bin/fbdoom
+}

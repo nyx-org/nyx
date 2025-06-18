@@ -1,0 +1,17 @@
+name=mg
+tarball_url="https://github.com/troglobit/mg/releases/download/v3.7/mg-3.7.tar.gz"
+tarball_blake2b="591dd11c1c6bd269b36b1760e787884b8ba805c50e479e3dfc344f3d488894ac120e7240f1f9af0f25b20f6af802f482bd6bfa072872807a00b4bd9aded09cfe"
+version=10.0.0
+revision=1
+hostdeps="gcc binutils automake autoconf"
+deps="core-libs"
+
+build() {
+    cp -r "${source_dir}"/* .
+    CC=${OS_TRIPLET}-gcc LD=${OS_TRIPLET}-ld ./configure --host=${OS_TRIPLET} --prefix=${dest_dir}/usr
+    make -j${parallelism}
+}
+
+package() {
+    make install DESTDIR="${dest_dir}"
+}

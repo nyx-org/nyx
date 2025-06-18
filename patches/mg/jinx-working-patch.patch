@@ -1,0 +1,22 @@
+diff --git mg-clean/build-aux/config.sub mg-workdir/build-aux/config.sub
+index dba16e8..e827ac5 100755
+--- mg-clean/build-aux/config.sub
++++ mg-workdir/build-aux/config.sub
+@@ -1723,7 +1723,7 @@ case $os in
+ 	# Now accept the basic system types.
+ 	# The portable systems comes first.
+ 	# Each alternative MUST end in a * to match a version number.
+-	gnu* | android* | bsd* | mach* | minix* | genix* | ultrix* | irix* \
++	gnu* | android* | bsd* | mach* | minix* | genix* | ultrix* | mlibc* | irix* \
+ 	     | *vms* | esix* | aix* | cnk* | sunos | sunos[34]* \
+ 	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
+ 	     | sym* |  plan9* | psp* | sim* | xray* | os68k* | v88r* \
+@@ -1792,6 +1792,8 @@ case $kernel-$os in
+ 		;;
+ 	*-eabi* | *-gnueabi*)
+ 		;;
++	*-mlibc*)
++		;;
+ 	-*)
+ 		# Blank kernel with real OS is always fine.
+ 		;;

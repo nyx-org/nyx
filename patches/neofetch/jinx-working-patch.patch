@@ -1,0 +1,54 @@
+diff --git neofetch-clean/neofetch neofetch-workdir/neofetch
+index 1e4b564..32848da 100755
+--- neofetch-clean/neofetch
++++ neofetch-workdir/neofetch
+@@ -929,6 +929,7 @@ get_os() {
+         AIX)      os=AIX ;;
+         IRIX*)    os=IRIX ;;
+         FreeMiNT) os=FreeMiNT ;;
++	    Gaia) os=Nyx;;
+ 
+         Linux|GNU*)
+             os=Linux
+@@ -954,6 +955,8 @@ get_distro() {
+     [[ $distro ]] && return
+ 
+     case $os in
++    	Nyx) distro=Nyx;;
++
+         Linux|BSD|MINIX)
+             if [[ -f /bedrock/etc/bedrock-release && $PATH == */bedrock/cross/* ]]; then
+                 case $distro_shorthand in
+@@ -5288,6 +5291,32 @@ get_distro_ascii() {
+     #
+     # $ascii_distro is the same as $distro.
+     case $(trim "$ascii_distro") in
++    	"Nyx"*)
++              set_colors 2 7
++            read -rd '' ascii_data <<'EOF'
++${c1}           `:+ssssossossss+-`
++        .oys///oyhddddhyo///sy+.
++      /yo:+hNNNNNNNNNNNNNNNNh+:oy/
++    :h/:yNNNNNNNNNNNNNNNNNNNNNNy-+h:
++  `ys.yNNNNNNNNNNNNNNNNNNNNNNNNNNy.ys
++ `h+-mNNNNNNNNNNNNNNNNNNNNNNNNNNNNm-oh
++ h+-NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN.oy
++/d`mNNNNNNN/::mNNNd::m+:/dNNNo::dNNNd`m:
++h//NNNNNNN: . .NNNh  mNo  od. -dNNNNN:+y
++N.sNNNNNN+ -N/ -NNh  mNNd.   sNNNNNNNo-m
++N.sNNNNNs  +oo  /Nh  mNNs` ` /mNNNNNNo-m
++h//NNNNh  ossss` +h  md- .hm/ `sNNNNN:+y
++:d`mNNN+/yNNNNNd//y//h//oNNNNy//sNNNd`m-
++ yo-NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNm.ss
++ `h+-mNNNNNNNNNNNNNNNNNNNNNNNNNNNNm-oy
++   sy.yNNNNNNNNNNNNNNNNNNNNNNNNNNs.yo
++    :h+-yNNNNNNNNNNNNNNNNNNNNNNs-oh-
++      :ys:/yNNNNNNNNNNNNNNNmy/:sy:
++        .+ys///osyhhhhys+///sy+.
++            -/osssossossso/-
++EOF
++        ;;
++
+         "AIX"*)
+             set_colors 2 7
+             read -rd '' ascii_data <<'EOF'
